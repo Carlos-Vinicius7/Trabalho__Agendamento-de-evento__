@@ -1,8 +1,7 @@
 # 🎓 Gestão de Treinamentos
 React Native Expo React Navigation Context API
 
-<img src="https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
-<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
+<img src="https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" /> <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
 <img src="https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white" />
 
 Um aplicativo móvel moderno e intuitivo para gerenciamento e acompanhamento de treinamentos corporativos, oferecendo uma interface limpa e funcionalidades completas para organizadores e participantes.
