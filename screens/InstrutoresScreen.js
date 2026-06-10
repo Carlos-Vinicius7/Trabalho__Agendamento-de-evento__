@@ -1,9 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Modal, Button, Alert, FlatList } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Modal, Alert, FlatList } from 'react-native';
 import { globalStyles } from './Styles/globalStyles';
 import { TrainingContext } from '../context/TrainingContext';
 
-// Tela para cadastrar, editar e excluir instrutores
 export default function InstrutoresScreen() {
   const { instrutores, addInstrutor, updateInstrutor, deleteInstrutor } = useContext(TrainingContext);
   
@@ -13,7 +12,6 @@ export default function InstrutoresScreen() {
   const [editingInstrutor, setEditingInstrutor] = useState(null);
 
   const handleAddInstrutor = () => {
-    // Valida as informações antes de cadastrar um novo instrutor
     if (!novoInstrutor.trim() || !novoEmail.trim() || !novaEspecialidade.trim()) {
       Alert.alert('Erro', 'Informe todos os dados do instrutor (Nome, Email, Especialidade).');
       return;
@@ -30,7 +28,6 @@ export default function InstrutoresScreen() {
   };
 
   const handleSaveInstrutorEdit = () => {
-    // Salva alterações em um instrutor existente
     if (editingInstrutor && editingInstrutor.nome.trim() && editingInstrutor.email?.trim() && editingInstrutor.especialidade?.trim()) {
       updateInstrutor(editingInstrutor.id, editingInstrutor.nome, editingInstrutor.email, editingInstrutor.especialidade);
       setEditingInstrutor(null);
@@ -51,48 +48,59 @@ export default function InstrutoresScreen() {
     <View style={globalStyles.container}>
       <Text style={globalStyles.title}>Gerenciar Instrutores</Text>
       
-      <View style={{ marginTop: 20, padding: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 8, backgroundColor: '#f9f9f9' }}>
-        <Text style={{ fontWeight: 'bold', marginBottom: 10 }}>Cadastrar Novo Instrutor</Text>
+      <View style={globalStyles.card}>
+        <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#1e1b4b', marginBottom: 15 }}>Cadastrar Novo Instrutor</Text>
+        
+        <Text style={globalStyles.label}>Nome</Text>
         <TextInput 
           style={globalStyles.input} 
-          placeholder="Nome do Instrutor" 
+          placeholder="Ex: Carlos Silva" 
           value={novoInstrutor} 
           onChangeText={setNovoInstrutor} 
         />
+
+        <Text style={globalStyles.label}>E-mail</Text>
         <TextInput 
           style={globalStyles.input} 
-          placeholder="E-mail" 
+          placeholder="Ex: carlos@email.com" 
           value={novoEmail} 
           onChangeText={setNovoEmail} 
           keyboardType="email-address"
         />
+
+        <Text style={globalStyles.label}>Especialidade</Text>
         <TextInput 
           style={globalStyles.input} 
-          placeholder="Especialidade (ex: Liderança, TI)" 
+          placeholder="Ex: Liderança, TI" 
           value={novaEspecialidade} 
           onChangeText={setNovaEspecialidade} 
         />
-        <TouchableOpacity style={[globalStyles.button, { backgroundColor: '#4b5563', marginTop: 5 }]} onPress={handleAddInstrutor}>
+
+        <TouchableOpacity style={globalStyles.buttonPrimary} onPress={handleAddInstrutor}>
           <Text style={globalStyles.buttonText}>Salvar Instrutor</Text>
         </TouchableOpacity>
       </View>
 
-      <Text style={{ fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>Lista de Instrutores</Text>
+      <Text style={{ fontWeight: 'bold', color: '#1e1b4b', marginTop: 10, marginBottom: 10, fontSize: 16 }}>Lista de Instrutores</Text>
       <FlatList
         data={instrutores}
         keyExtractor={item => item.id}
+        showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 10, borderBottomWidth: 1, borderColor: '#eee' }}>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontWeight: 'bold' }}>{item.nome}</Text>
-              <Text style={{ fontSize: 12, color: '#666' }}>{item.email} • {item.especialidade}</Text>
+          <View style={globalStyles.card}>
+            <View style={{ marginBottom: 10 }}>
+              <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#1e1b4b' }}>{item.nome}</Text>
+              <Text style={{ fontSize: 14, color: '#64748b', marginTop: 2 }}>{item.email} • {item.especialidade}</Text>
             </View>
-            <View style={{ flexDirection: 'row' }}>
-              <TouchableOpacity onPress={() => handleEditInstrutor(item)} style={{ marginRight: 15 }}>
-                <Text style={{ color: '#4b5563', fontWeight: 'bold' }}>Editar</Text>
+            
+            <View style={{ height: 1, backgroundColor: '#e2e8f0', marginBottom: 10 }} />
+
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TouchableOpacity style={[globalStyles.actionButtonLight, { flex: 1, alignItems: 'center' }]} onPress={() => handleEditInstrutor(item)}>
+                <Text style={globalStyles.actionTextLight}>Editar</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDeleteInstrutor(item.id)}>
-                <Text style={{ color: 'red', fontWeight: 'bold' }}>Excluir</Text>
+              <TouchableOpacity style={[globalStyles.actionButtonDanger, { flex: 1, alignItems: 'center' }]} onPress={() => handleDeleteInstrutor(item.id)}>
+                <Text style={globalStyles.actionTextDanger}>Excluir</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -101,34 +109,38 @@ export default function InstrutoresScreen() {
 
       <Modal visible={!!editingInstrutor} transparent={true} animationType="fade">
         <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', padding: 20 }}>
-          <View style={{ backgroundColor: '#fff', padding: 20, borderRadius: 10 }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 15 }}>Editar Instrutor</Text>
+          <View style={{ backgroundColor: '#fff', padding: 25, borderRadius: 20 }}>
+            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1e1b4b', marginBottom: 20 }}>Editar Instrutor</Text>
             
+            <Text style={globalStyles.label}>Nome</Text>
             <TextInput 
               style={globalStyles.input} 
-              placeholder="Nome do Instrutor" 
               value={editingInstrutor?.nome} 
               onChangeText={(text) => setEditingInstrutor({ ...editingInstrutor, nome: text })} 
             />
+
+            <Text style={globalStyles.label}>E-mail</Text>
             <TextInput 
               style={globalStyles.input} 
-              placeholder="E-mail" 
               value={editingInstrutor?.email} 
               onChangeText={(text) => setEditingInstrutor({ ...editingInstrutor, email: text })} 
               keyboardType="email-address"
             />
+
+            <Text style={globalStyles.label}>Especialidade</Text>
             <TextInput 
               style={globalStyles.input} 
-              placeholder="Especialidade" 
               value={editingInstrutor?.especialidade} 
               onChangeText={(text) => setEditingInstrutor({ ...editingInstrutor, especialidade: text })} 
             />
 
-            <View style={{ marginTop: 10 }}>
-              <Button color="#7c3aed" title="Salvar Alterações" onPress={handleSaveInstrutorEdit} />
-            </View>
-            <View style={{ marginTop: 10 }}>
-              <Button color="#ef4444" title="Cancelar" onPress={() => setEditingInstrutor(null)} />
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10, gap: 15 }}>
+              <TouchableOpacity style={globalStyles.buttonSecondary} onPress={() => setEditingInstrutor(null)}>
+                <Text style={globalStyles.buttonTextSecondary}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={globalStyles.buttonPrimary} onPress={handleSaveInstrutorEdit}>
+                <Text style={globalStyles.buttonText}>Salvar Alterações</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>

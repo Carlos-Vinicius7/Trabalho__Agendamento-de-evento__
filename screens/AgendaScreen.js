@@ -1,51 +1,76 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Linking, Button, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Linking, Alert } from 'react-native';
 import { TrainingContext } from '../context/TrainingContext';
 import { globalStyles } from './Styles/globalStyles';
 
-// Tela que mostra a lista de treinamentos e permite inscrição
 export default function AgendaScreen({ navigation }) {
   const { treinamentos, user, inscreverTreinamento } = useContext(TrainingContext);
-  const [minhas, setMinhas] = useState(false); // controla se mostra apenas as inscrições do usuário
+  const [minhas, setMinhas] = useState(false); 
 
-  // Se ativado, exibe apenas os treinamentos em que o usuário já está inscrito
   const dados = minhas ? treinamentos.filter(t => t.inscritos.includes(user.id)) : treinamentos;
 
   return (
     <View style={globalStyles.container}>
-      <Text style={globalStyles.title}>Agenda de Treinamentos</Text>
-      <View style={{ marginBottom: 15 }}>
-        <Button color="#7c3aed" title={minhas ? "Ver Todos" : "Ver Minhas Inscrições"} onPress={() => setMinhas(!minhas)} />
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
+        <View style={{ flex: 1, minWidth: 200 }}>
+          <Text style={[globalStyles.title, { marginBottom: 0 }]}>Agenda de Treinamentos</Text>
+          <Text style={{ color: '#64748b' }}>{dados.length} treinamento(s) encontrado(s)</Text>
+        </View>
+        <TouchableOpacity style={globalStyles.buttonPrimary} onPress={() => setMinhas(!minhas)}>
+          <Text style={globalStyles.buttonText}>{minhas ? "Ver Todos" : "Minhas Inscrições"}</Text>
+        </TouchableOpacity>
       </View>
+
       <FlatList
         data={dados}
         keyExtractor={i => i.treinamento_id}
-        renderItem={({ item }) => (
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item, index }) => (
           <View style={globalStyles.card}>
-            <Text style={{ fontWeight: 'bold' }}>{item.descricao}</Text>
-            <Text>Início: {item.datahora_inicio}</Text>
-            {item.local && <Text>Local: {item.local}</Text>}
-            {item.materialUrl && (
-              <TouchableOpacity onPress={() => Linking.openURL(item.materialUrl)}>
-                <Text style={{ color: '#7c3aed', marginVertical: 5 }}>📂 Acessar Material</Text>
-              </TouchableOpacity>
-            )}
+            <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#1e1b4b', marginBottom: 10 }}>
+              #{index + 1} - {item.descricao}
+            </Text>
             
-            {item.inscritos.includes(user.id) ? (
-              <Text style={{ color: 'green', fontWeight: 'bold', marginTop: 5 }}>✅ Inscrito</Text>
-            ) : (
-              <View style={{ marginTop: 5 }}>
-                <Button 
-                  color="#7c3aed"
-                  title="Inscrever-se" 
+            {item.local && (
+              <View style={globalStyles.pill}>
+                <Text style={globalStyles.pillText}>{item.local}</Text>
+              </View>
+            )}
+
+            <View style={{ marginVertical: 10 }}>
+              <Text style={{ color: '#334155', fontWeight: '500', marginBottom: 4 }}>
+                Início: <Text style={{ fontWeight: 'normal' }}>{item.datahora_inicio}</Text>
+              </Text>
+              {item.instrutor && (
+                <Text style={{ color: '#334155', fontWeight: '500', marginBottom: 4 }}>
+                  Instrutor: <Text style={{ fontWeight: 'normal' }}>{item.instrutor}</Text>
+                </Text>
+              )}
+            </View>
+
+            <View style={globalStyles.actionRow}>
+              {item.materialUrl && (
+                <TouchableOpacity style={globalStyles.actionButtonLight} onPress={() => Linking.openURL(item.materialUrl)}>
+                  <Text style={globalStyles.actionTextLight}>Acessar Material</Text>
+                </TouchableOpacity>
+              )}
+              
+              {item.inscritos.includes(user.id) ? (
+                <View style={[globalStyles.actionButtonLight, { backgroundColor: '#dcfce7' }]}>
+                  <Text style={[globalStyles.actionTextLight, { color: '#166534' }]}>✅ Inscrito</Text>
+                </View>
+              ) : (
+                <TouchableOpacity 
+                  style={[globalStyles.actionButtonLight, { backgroundColor: '#4f46e5' }]}
                   onPress={() => {
-                    // Registra inscrição do usuário no treinamento
                     inscreverTreinamento(item.treinamento_id, user.id);
                     Alert.alert('Sucesso', 'Inscrição realizada!');
                   }} 
-                />
-              </View>
-            )}
+                >
+                  <Text style={[globalStyles.actionTextLight, { color: '#fff' }]}>Inscrever-se</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         )}
       />

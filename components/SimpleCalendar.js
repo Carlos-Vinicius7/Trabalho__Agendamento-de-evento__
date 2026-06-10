@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, Button } from 'react-native';
+import { View, Text, TouchableOpacity, Modal } from 'react-native';
+import { globalStyles } from '../screens/Styles/globalStyles';
 
 // Componente de calendário simples para seleção de intervalo de datas
 export default function SimpleCalendar({ visible, onClose, onConfirm }) {
@@ -65,31 +66,31 @@ export default function SimpleCalendar({ visible, onClose, onConfirm }) {
   };
 
   return (
-    <Modal visible={visible} transparent={true} animationType="slide">
+    <Modal visible={visible} transparent={true} animationType="fade">
       <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', padding: 20 }}>
-        <View style={{ backgroundColor: '#fff', padding: 20, borderRadius: 10 }}>
+        <View style={{ backgroundColor: '#fff', padding: 25, borderRadius: 20 }}>
           
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <TouchableOpacity onPress={() => changeYear(-1)} style={{ padding: 5 }}>
-              <Text style={{ fontSize: 18, color: '#4b5563', fontWeight: 'bold' }}>{'<<'}</Text>
+              <Text style={{ fontSize: 18, color: '#64748b', fontWeight: 'bold' }}>{'<<'}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => changeMonth(-1)} style={{ padding: 5 }}>
-              <Text style={{ fontSize: 18, color: '#4b5563', fontWeight: 'bold' }}>{'<'}</Text>
+              <Text style={{ fontSize: 18, color: '#64748b', fontWeight: 'bold' }}>{'<'}</Text>
             </TouchableOpacity>
             
-            <Text style={{ fontSize: 16, fontWeight: 'bold', minWidth: 120, textAlign: 'center' }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#1e1b4b', minWidth: 120, textAlign: 'center' }}>
               {monthNames[month]} {year}
             </Text>
             
             <TouchableOpacity onPress={() => changeMonth(1)} style={{ padding: 5 }}>
-              <Text style={{ fontSize: 18, color: '#4b5563', fontWeight: 'bold' }}>{'>'}</Text>
+              <Text style={{ fontSize: 18, color: '#64748b', fontWeight: 'bold' }}>{'>'}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => changeYear(1)} style={{ padding: 5 }}>
-              <Text style={{ fontSize: 18, color: '#4b5563', fontWeight: 'bold' }}>{'>>'}</Text>
+              <Text style={{ fontSize: 18, color: '#64748b', fontWeight: 'bold' }}>{'>>'}</Text>
             </TouchableOpacity>
           </View>
           
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 20 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 25 }}>
             {dias.map(dia => {
               const isSelected = isSelectedDay(dia);
               return (
@@ -97,12 +98,12 @@ export default function SimpleCalendar({ visible, onClose, onConfirm }) {
                   key={dia} 
                   onPress={() => handleSelect(dia)}
                   style={{
-                    width: 35, height: 35, justifyContent: 'center', alignItems: 'center',
-                    margin: 2, borderRadius: 17.5,
-                    backgroundColor: isSelected ? '#7c3aed' : '#e5e7eb'
+                    width: 40, height: 40, justifyContent: 'center', alignItems: 'center',
+                    margin: 2, borderRadius: 12,
+                    backgroundColor: isSelected ? '#4f46e5' : '#f8fafc'
                   }}
                 >
-                  <Text style={{ color: isSelected ? '#fff' : '#000', fontWeight: isSelected ? 'bold' : 'normal' }}>
+                  <Text style={{ color: isSelected ? '#fff' : '#1e1b4b', fontWeight: isSelected ? 'bold' : 'normal' }}>
                     {dia}
                   </Text>
                 </TouchableOpacity>
@@ -110,11 +111,13 @@ export default function SimpleCalendar({ visible, onClose, onConfirm }) {
             })}
           </View>
 
-          <View style={{ marginTop: 10 }}>
-            <Button color="#7c3aed" title="Confirmar Período" onPress={handleConfirm} />
-          </View>
-          <View style={{ marginTop: 10 }}>
-            <Button color="#ef4444" title="Cancelar" onPress={onClose} />
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 15 }}>
+            <TouchableOpacity style={globalStyles.buttonSecondary} onPress={onClose}>
+              <Text style={globalStyles.buttonTextSecondary}>Cancelar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={globalStyles.buttonPrimary} onPress={handleConfirm}>
+              <Text style={globalStyles.buttonText}>Confirmar</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>

@@ -3,22 +3,24 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { globalStyles } from './Styles/globalStyles';
 import { TrainingContext } from '../context/TrainingContext';
 
-// Tela inicial que mostra informações gerais e navegação rápida
 export default function HomeScreen({ navigation }) {
-  const { treinamentos, user } = useContext(TrainingContext); // obtém dados do contexto global
+  const { treinamentos, user } = useContext(TrainingContext);
   
   return (
     <View style={globalStyles.container}>
       <Text style={globalStyles.title}>Bem-vindo, {user.nome}</Text>
       
       <TouchableOpacity style={globalStyles.card} onPress={() => navigation.navigate('Agenda')}>
-        <Text style={{fontWeight: 'bold', fontSize: 16}}>Visão Geral</Text>
-        <Text style={{marginTop: 10}}>Total de treinamentos no sistema: {treinamentos.length}</Text>
+        <Text style={{fontWeight: 'bold', fontSize: 18, color: '#1e1b4b'}}>Visão Geral</Text>
+        <Text style={{marginTop: 5, color: '#64748b'}}>Total de treinamentos no sistema: <Text style={{fontWeight: 'bold', color: '#4f46e5'}}>{treinamentos.length}</Text></Text>
       </TouchableOpacity>
 
-      <View style={[globalStyles.card, { marginTop: 20 }]}>
-        <Text style={{fontWeight: 'bold'}}>Status do Perfil</Text>
-        <Text>Seu nível de acesso: {user.role}</Text>
+      <View style={globalStyles.card}>
+        <Text style={{fontWeight: 'bold', fontSize: 18, color: '#1e1b4b'}}>Status do Perfil</Text>
+        <Text style={{marginTop: 5, color: '#64748b'}}>Seu nível de acesso:</Text>
+        <View style={[globalStyles.pill, { marginTop: 10 }]}>
+          <Text style={globalStyles.pillText}>{user.role}</Text>
+        </View>
       </View>
     </View>
   );

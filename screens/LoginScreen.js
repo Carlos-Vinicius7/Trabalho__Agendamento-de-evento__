@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, SafeAreaView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { globalStyles } from './Styles/globalStyles';
 import { TrainingContext } from '../context/TrainingContext';
 
-// Tela de login e cadastro de usuários
 export default function LoginScreen({ navigation }) {
   const { setUser, addUsuario, usuarios } = useContext(TrainingContext);
   const [nome, setNome] = useState('');
@@ -17,7 +17,6 @@ export default function LoginScreen({ navigation }) {
     }
 
     if (isRegistering) {
-      // Cria uma nova conta caso o usuário esteja no modo de registro
       const existingUser = usuarios.find(u => u.nome.toLowerCase() === nome.toLowerCase());
       if (existingUser) {
         Alert.alert('Erro', 'Nome de usuário já existe.');
@@ -25,13 +24,11 @@ export default function LoginScreen({ navigation }) {
       }
       const newUser = addUsuario(nome, senha, 'Organizador');
       setUser(newUser);
-      Alert.alert('Sucesso', 'Conta criada com sucesso!');
       navigation.replace('Main');
     } else {
-      // Autentica usuário existente
       const existingUser = usuarios.find(u => u.nome.toLowerCase() === nome.toLowerCase());
       if (existingUser) {
-        if (existingUser.senha === senha || existingUser.senha === undefined) { // allow undefined for old users without pass
+        if (existingUser.senha === senha || existingUser.senha === undefined) { 
           setUser(existingUser);
           navigation.replace('Main');
         } else {
@@ -44,31 +41,92 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <View style={[globalStyles.container, { justifyContent: 'center' }]}>
-      <Text style={globalStyles.title}>{isRegistering ? 'Criar Conta' : 'Login Corporativo'}</Text>
-      <TextInput 
-        style={globalStyles.input} 
-        placeholder="Seu Nome" 
-        value={nome} 
-        onChangeText={setNome} 
-      />
-      <TextInput 
-        style={globalStyles.input} 
-        placeholder="Sua Senha" 
-        value={senha} 
-        onChangeText={setSenha}
-        secureTextEntry 
-      />
-      
-      <TouchableOpacity style={globalStyles.button} onPress={handleAction}>
-        <Text style={globalStyles.buttonText}>{isRegistering ? 'Cadastrar e Entrar' : 'Entrar'}</Text>
-      </TouchableOpacity>
+    <SafeAreaView style={styles.background}>
+      <View style={styles.cardContainer}>
+        {/* Ícone do Topo */}
+        <View style={styles.iconBox}>
+          <Ionicons name="school" size={40} color="#fff" />
+        </View>
 
-      <TouchableOpacity onPress={() => setIsRegistering(!isRegistering)} style={{ marginTop: 20, alignItems: 'center' }}>
-        <Text style={{ color: '#7c3aed', fontWeight: 'bold' }}>
-          {isRegistering ? 'Já tem uma conta? Entre aqui' : 'Não tem conta? Cadastre-se'}
-        </Text>
-      </TouchableOpacity>
-    </View>
+        <Text style={styles.headerTitle}>Gestão de Treinamentos</Text>
+        <Text style={styles.headerSubtitle}>Sistema de controle corporativo</Text>
+
+        <Text style={globalStyles.label}>Nome</Text>
+        <TextInput 
+          style={globalStyles.input} 
+          placeholder="Digite seu nome" 
+          value={nome} 
+          onChangeText={setNome} 
+        />
+
+        <Text style={globalStyles.label}>Senha</Text>
+        <TextInput 
+          style={globalStyles.input} 
+          placeholder="Digite sua senha" 
+          value={senha} 
+          onChangeText={setSenha}
+          secureTextEntry 
+        />
+        
+        <TouchableOpacity style={[globalStyles.buttonPrimary, { marginTop: 10 }]} onPress={handleAction}>
+          <Text style={globalStyles.buttonText}>{isRegistering ? 'Cadastrar' : 'Entrar'}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => setIsRegistering(!isRegistering)} style={{ marginTop: 20, alignItems: 'center' }}>
+          <Text style={{ color: '#4f46e5', fontWeight: 'bold' }}>
+            {isRegistering ? 'Já tenho cadastro' : 'Criar uma conta'}
+          </Text>
+        </TouchableOpacity>
+
+        {!isRegistering && (
+          <Text style={styles.footerInfo}>Login inicial: Carlos | Senha: 1234</Text>
+        )}
+      </View>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    backgroundColor: '#1e1b4b', // Fundo escuro (roxo profundo)
+    justifyContent: 'center',
+    padding: 20,
+  },
+  cardContainer: {
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    padding: 25,
+    paddingTop: 35,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+  },
+  iconBox: {
+    backgroundColor: '#4f46e5', // Roxo principal
+    width: 70,
+    height: 70,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1e1b4b',
+    marginBottom: 5,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: '#64748b',
+    marginBottom: 30,
+  },
+  footerInfo: {
+    marginTop: 20,
+    textAlign: 'center',
+    fontSize: 12,
+    color: '#64748b',
+  }
+});

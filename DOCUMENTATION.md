@@ -1,153 +1,222 @@
 # Documentação do Projeto AV2
 
-Este documento descreve o propósito de cada `screen`, `context` e `component` do projeto.
+Este documento descreve o propósito de cada arquivo principal, a arquitetura do aplicativo e como rodar o projeto.
 
-## Estrutura Geral
+## Visão Geral
 
-- `App.js`: componente raiz que configura o provedor de contexto (`TrainingProvider`), o gradiente de fundo e a navegação da aplicação.
-- `index.js`: ponto de entrada do Expo que registra o componente `App` como raiz da aplicação.
+O app é um sistema de gestão de treinamentos organizado como uma aplicação React Native com Expo. Ele oferece funcionalidades para:
 
-## Context
+- consultar agenda de treinamentos;
+- cadastrar novos cursos e instrutores;
+- inscrever usuários em eventos;
+- registrar presença e gerar certificados;
+- enviar notificações;
+- exibir relatórios e avaliações.
+
+A estrutura foi pensada para facilitar o uso em dispositivos móveis e para permitir diferentes perfis de usuário (participante, gestor/admin).
+
+## Tecnologias Utilizadas
+
+- React Native
+- Expo
+- React Navigation (Stack e Bottom Tabs)
+- Context API para gerenciamento global de estado
+- `expo-linear-gradient` para layout com gradientes
+- `@expo/vector-icons` para ícones
+
+## Estrutura de Arquivos
+
+- `App.js`: componente raiz e configuração de navegação.
+- `index.js`: ponto de entrada do Expo.
+- `context/TrainingContext.js`: provedor de estado global e funções de CRUD.
+- `screens/`: telas da aplicação.
+- `components/`: componentes reutilizáveis.
+- `screens/Styles/globalStyles.js`: estilos compartilhados.
+
+## Contexto Global
 
 ### `context/TrainingContext.js`
-- Define e exporta `TrainingContext` e `TrainingProvider`.
-- Armazena estados globais usados em toda a aplicação:
-  - `treinamentos`: lista de treinamentos cadastrados.
-  - `user`: usuário logado atualmente.
-  - `presencas`: registros de presença nos treinamentos.
-  - `avaliacoes`: avaliações enviadas pelos usuários.
-  - `notificacoes`: mensagens de aviso exibidas na tela de notificações.
-  - `usuarios`: lista de usuários que podem se autenticar.
-  - `instrutores`: lista de instrutores cadastrados.
-- Define funções de manipulação de dados:
-  - `addInstrutor`, `updateInstrutor`, `deleteInstrutor`: CRUD de instrutores.
-  - `addUsuario`: registra um novo usuário no sistema.
-  - `addTraining`, `updateTraining`, `deleteTraining`: CRUD de treinamentos.
-  - `inscreverTreinamento`: inscreve um usuário em um treinamento.
-  - `podeGerarCertificado`: verifica se um usuário pode gerar um certificado com base na presença.
-- Fornece dados mock para tipos de treinamento.
 
-## Screens
+Responsável por armazenar e compartilhar dados entre as telas. Contém:
 
-### `screens/HomeScreen.js`
-- Tela inicial de boas-vindas.
-- Mostra o nome do usuário logado e um resumo do número total de treinamentos.
-- Exibe o papel do usuário (`role`).
-- Permite navegar para a tela de `Agenda`.
+- estados principais:
+  - `treinamentos`
+  - `user`
+  - `presencas`
+  - `avaliacoes`
+  - `notificacoes`
+  - `usuarios`
+  - `instrutores`
+- funções de manipulação:
+  - `addInstrutor`, `updateInstrutor`, `deleteInstrutor`
+  - `addUsuario`
+  - `addTraining`, `updateTraining`, `deleteTraining`
+  - `inscreverTreinamento`
+  - `podeGerarCertificado`
+- dados mock de tipos de treinamento e status.
 
-### `screens/AgendaScreen.js`
-- Exibe a lista de treinamentos disponíveis.
-- Permite alternar entre todos os treinamentos e apenas as inscrições do usuário.
-- Cada item mostra informações do evento e permite inscrição.
-- Se já inscrito, mostra um status de confirmação.
-- Possui link para abrir material de treinamento quando disponível.
-
-### `screens/CadastroScreen.js`
-- Tela usada para cadastrar um novo treinamento.
-- Inclui campos para descrição, período, capacidade, local, observação, tipo de treinamento e instrutor.
-- Usa `SimpleCalendar` para seleção de período e `CustomPicker` para escolher tipo e instrutor.
-- Valida campos obrigatórios antes de salvar.
-
-### `screens/CertificadoScreen.js`
-- Lista todos os treinamentos para os quais o usuário pode gerar certificado.
-- Verifica se o usuário tem presença registrada antes de liberar a geração.
-- Permite editar o nome que será impresso no certificado.
-- Simula o processo de geração/baixar certificado exibindo um alerta.
+## Telas (Screens)
 
 ### `screens/LoginScreen.js`
-- Tela de autenticação e registro.
-- Permite login de usuários existentes ou criação de nova conta.
-- Salva o usuário no contexto quando autenticado.
-- Navega para a tela principal após login ou registro.
 
-### `screens/AvaliacaoScreen.js`
-- Tela para enviar avaliação de um treinamento específico.
-- Recebe `treinamento_id` via rota.
-- Captura nota e comentário.
-- Salva a avaliação no contexto e retorna para a tela anterior.
+Tela inicial de autenticação e registro. Permite:
+
+- login de usuário existente;
+- cadastro de novo usuário;
+- salvamento do usuário autenticado no contexto;
+- navegação para a área principal após autenticação.
+
+### `screens/HomeScreen.js`
+
+Dashboard principal. Exibe:
+
+- nome do usuário logado;
+- papel/role do usuário;
+- resumo de treinamentos cadastrados;
+- acesso rápido para telas principais.
+
+### `screens/AgendaScreen.js`
+
+Agenda de eventos e treinamentos. Possui:
+
+- lista de treinamentos disponíveis;
+- filtro entre todos os treinamentos e inscrições do usuário;
+- botão de inscrição;
+- indicação de status de inscrição;
+- opção de acessar material quando disponível.
+
+### `screens/CadastroScreen.js`
+
+Formulário de cadastro de treinamentos. Inclui:
+
+- campos de descrição, local, observação e capacidade;
+- seleção de período com `SimpleCalendar`;
+- seleção de tipo e instrutor com `CustomPicker`;
+- validação de campos obrigatórios.
 
 ### `screens/GestaoScreen.js`
-- Tela de gestão de treinamentos e presenças.
-- Lista todos os treinamentos cadastrados.
-- Permite marcar presença para o usuário logado.
-- Permite enviar notificações no contexto.
-- Permite editar ou excluir eventos.
-- Usa `SimpleCalendar` para selecionar período ao editar um evento.
-- Usa `CustomPicker` para alterar tipo de treinamento e instrutor.
+
+Gestão de treinamentos e presença. Permite:
+
+- listar todos os treinamentos;
+- marcar presença do usuário no evento;
+- editar ou excluir eventos;
+- enviar notificações internas;
+- usar calendário para alterar datas de evento.
 
 ### `screens/InstrutoresScreen.js`
-- Tela para gerenciar instrutores.
-- Permite adicionar novo instrutor com nome, email e especialidade.
-- Exibe lista de instrutores existentes.
-- Permite editar dados de um instrutor e excluir instrutores.
+
+Gerenciamento completo de instrutores. Funcionalidades:
+
+- adicionar instrutores;
+- editar informações de instrutores;
+- excluir instrutores;
+- exibir lista de profissionais cadastrados.
+
+### `screens/CertificadoScreen.js`
+
+Geração de certificados de participação. Verifica:
+
+- se o usuário possui presença registrada;
+- se o treinamento está elegível para certificado;
+- permite editar nome do certificado;
+- simula o processo de geração/baixar certificado.
+
+### `screens/AvaliacaoScreen.js`
+
+Envio de avaliações do treinamento. Detalhes:
+
+- recebe `treinamento_id` via parâmetros de rota;
+- captura nota e comentário;
+- armazena avaliação no contexto;
+- retorna para a tela anterior ao finalizar.
 
 ### `screens/NotificacoesScreen.js`
-- Tela que exibe todas as notificações salvas no contexto.
-- Mostra cada aviso em um cartão simples.
+
+Exibe as notificações do sistema. Cada notificação:
+
+- aparece em um cartão;
+- mostra texto e data de criação;
+- é extraída do estado global de `notificacoes`.
 
 ### `screens/RelatoriosScreen.js`
-- Tela de relatórios e indicadores.
-- Calcula total de treinamentos cadastrados.
-- Calcula média de notas das avaliações.
-- Exibe o total de avaliações recebidas.
 
-## Components
+Apresenta métricas e indicadores básicos:
 
-### `components/AssetExample.js`
-- Componente de exemplo para demonstrar a importação de imagens locais.
-- Usa `Image` para exibir um recurso estático.
-- Não é parte central do fluxo de treinamentos.
+- total de treinamentos cadastrados;
+- média das avaliações recebidas;
+- total de avaliações enviadas.
+
+### `screens/AdminScreen.js`
+
+Painel administrativo. Serve como área de controle geral e pode conter:
+
+- visualização de dados administrativos;
+- atalhos para funções de gestão;
+- opções específicas para usuários com perfil admin.
+
+## Componentes Reutilizáveis
 
 ### `components/CustomPicker.js`
-- Componente customizado de seleção de item.
-- Recebe lista de `items`, `selectedValue`, `onValueChange` e `placeholder`.
-- Exibe um botão que abre uma lista em `FlatList`.
-- Permite selecionar um item e fechar o modal.
+
+Picker customizado para seleção de itens. Características:
+
+- recebe `items`, `selectedValue`, `onValueChange` e `placeholder`;
+- abre modal com lista via `FlatList`;
+- permite escolher um item e fechar o modal.
 
 ### `components/SimpleCalendar.js`
-- Componente de calendário simples para seleção de intervalos de datas.
-- Exibe o mês atual e permite avançar/retroceder mês e ano.
-- Permite selecionar data de início e data de fim.
-- Destaque os dias selecionados e intervalos.
-- Chama `onConfirm` com as datas formatadas e `onClose` para fechar.
 
-## Styles
+Componente de calendário para seleção de intervalo. Ele:
+
+- navega entre meses e anos;
+- seleciona data de início e fim;
+- destaca intervalos escolhidos;
+- retorna as datas selecionadas via `onConfirm`.
+
+## Estilos
 
 ### `screens/Styles/globalStyles.js`
-- Define estilos reutilizáveis para o app.
-- Inclui estilos para:
-  - contêiner principal (`container`)
-  - títulos (`title`)
-  - campos de entrada (`input`)
-  - cartões de conteúdo (`card`)
-  - botões (`button`, `buttonText`)
 
-## Observações
+Define estilos globais usados pelo app. Inclui:
 
-- A navegação principal é montada em `App.js` usando `react-navigation`.
-- `TrainingProvider` envolve a aplicação para fornecer dados de estado a todas as telas.
-- Algumas telas e componentes são focados em fluxo de cadastro/gestão, enquanto outras servem apenas para visualização.
+- contêiner principal (`container`);
+- textos e títulos (`title`, `subtitle`);
+- botões (`button`, `buttonText`);
+- cartões de exibição (`card`).
 
-## Sumário Rápido
+## Dependências Principais
 
-Lista curta com links para os arquivos principais do projeto:
+- `expo`
+- `react`
+- `react-native`
+- `react-navigation/native`
+- `@react-navigation/stack`
+- `@react-navigation/bottom-tabs`
+- `react-native-gesture-handler`
+- `react-native-safe-area-context`
+- `react-native-screens`
+- `expo-linear-gradient`
+- `@expo/vector-icons`
+- `react-native-paper`
 
-- `App.js`: [App.js](App.js) — Componente raiz que configura navegação e provedor de contexto.
-- `index.js`: [index.js](index.js) — Ponto de entrada Expo que registra o componente raiz.
-- `context/TrainingContext.js`: [context/TrainingContext.js](context/TrainingContext.js) — Contexto global: estados e funções de CRUD.
-- `screens/HomeScreen.js`: [screens/HomeScreen.js](screens/HomeScreen.js) — Tela inicial; mostra resumo e navegação rápida.
-- `screens/AgendaScreen.js`: [screens/AgendaScreen.js](screens/AgendaScreen.js) — Lista de treinamentos e inscrições.
-- `screens/CadastroScreen.js`: [screens/CadastroScreen.js](screens/CadastroScreen.js) — Formulário para criar treinamentos.
-- `screens/GestaoScreen.js`: [screens/GestaoScreen.js](screens/GestaoScreen.js) — Gestão de presenças, edição e notificações.
-- `screens/CertificadoScreen.js`: [screens/CertificadoScreen.js](screens/CertificadoScreen.js) — Gerar/baixar certificados (simulado).
-- `screens/InstrutoresScreen.js`: [screens/InstrutoresScreen.js](screens/InstrutoresScreen.js) — CRUD de instrutores.
-- `screens/LoginScreen.js`: [screens/LoginScreen.js](screens/LoginScreen.js) — Login e registro de usuários.
-- `screens/AvaliacaoScreen.js`: [screens/AvaliacaoScreen.js](screens/AvaliacaoScreen.js) — Envio de avaliações por treinamento.
-- `screens/NotificacoesScreen.js`: [screens/NotificacoesScreen.js](screens/NotificacoesScreen.js) — Exibe notificações do sistema.
-- `screens/RelatoriosScreen.js`: [screens/RelatoriosScreen.js](screens/RelatoriosScreen.js) — Indicadores e métricas básicas.
-- `screens/AdminScreen.js`: [screens/AdminScreen.js](screens/AdminScreen.js) — Painel administrativo (exemplo).
-- `components/SimpleCalendar.js`: [components/SimpleCalendar.js](components/SimpleCalendar.js) — Seletor de intervalo de datas.
-- `components/CustomPicker.js`: [components/CustomPicker.js](components/CustomPicker.js) — Picker customizado para listas.
-- `components/AssetExample.js`: [components/AssetExample.js](components/AssetExample.js) — Exemplo de asset local.
-- `screens/Styles/globalStyles.js`: [screens/Styles/globalStyles.js](screens/Styles/globalStyles.js) — Estilos globais reutilizados.
+## Resumo dos Arquivos Principais
+
+- `App.js` — ponto de entrada e configuração de rotas.
+- `index.js` — registro do app Expo.
+- `context/TrainingContext.js` — estado global e lógica de CRUD.
+- `screens/LoginScreen.js` — autenticação de usuários.
+- `screens/HomeScreen.js` — dashboard principal.
+- `screens/AgendaScreen.js` — agenda de treinamentos.
+- `screens/CadastroScreen.js` — cadastro de treinamentos.
+- `screens/GestaoScreen.js` — gestão e presença.
+- `screens/InstrutoresScreen.js` — CRUD de instrutores.
+- `screens/CertificadoScreen.js` — certificados.
+- `screens/AvaliacaoScreen.js` — avaliações.
+- `screens/NotificacoesScreen.js` — central de notificações.
+- `screens/RelatoriosScreen.js` — relatórios.
+- `screens/AdminScreen.js` — painel administrativo.
+- `components/SimpleCalendar.js` — seletor de datas.
+- `components/CustomPicker.js` — seleção customizada.
+- `screens/Styles/globalStyles.js` — estilos globais.
 

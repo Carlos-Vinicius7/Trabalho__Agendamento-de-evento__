@@ -1,10 +1,11 @@
 import React, { useContext } from 'react';
+import { View } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { LinearGradient } from 'expo-linear-gradient';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { TrainingProvider, TrainingContext } from './context/TrainingContext';
 import { Ionicons } from '@expo/vector-icons';
+import Header from './components/Header';
 
 import HomeScreen from './screens/HomeScreen';
 import AgendaScreen from './screens/AgendaScreen';
@@ -16,41 +17,60 @@ import NotificacoesScreen from './screens/NotificacoesScreen';
 import LoginScreen from './screens/LoginScreen';
 import AvaliacaoScreen from './screens/AvaliacaoScreen';
 
-// Cria os navegadores de pilha (Stack) e abas (Tab)
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // Componente de abas principais que mostra diferentes seções conforme o papel do usuário
-function MainTabs() {
-  const { user } = useContext(TrainingContext); // Recupera dados do usuário logado
+function MainTabs({ navigation }) {
+  const { user, setUser } = useContext(TrainingContext); // Recupera dados do usuário logado
+
+  const handleLogout = () => {
+    setUser(null);
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
+  };
+
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-          if (route.name === 'Home') iconName = focused ? 'home' : 'home-outline';
-          else if (route.name === 'Agenda') iconName = focused ? 'calendar' : 'calendar-outline';
-          else if (route.name === 'Cadastro') iconName = focused ? 'build' : 'build-outline';
-          else if (route.name === 'Gestão') iconName = focused ? 'people' : 'people-outline';
-          else if (route.name === 'Certificados') iconName = focused ? 'ribbon' : 'ribbon-outline';
-          else if (route.name === 'Notificações') iconName = focused ? 'notifications' : 'notifications-outline';
-          else if (route.name === 'Instrutores') iconName = focused ? 'person-add' : 'person-add-outline';
-          
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: '#7c3aed',
-        tabBarInactiveTintColor: 'gray',
-      })}
-    >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Agenda" component={AgendaScreen} />
-      {/* Exibe abas de cadastro e instrutores apenas para roles específicos */}
-      {(user.role === 'Organizador' || user.role === 'Administrador') && <Tab.Screen name="Cadastro" component={CadastroScreen} />}
-      {(user.role === 'Organizador' || user.role === 'Administrador') && <Tab.Screen name="Instrutores" component={InstrutoresScreen} />}
-      <Tab.Screen name="Gestão" component={GestaoScreen} />
-      <Tab.Screen name="Certificados" component={CertificadoScreen} />
-      <Tab.Screen name="Notificações" component={NotificacoesScreen} />
-    </Tab.Navigator>
+    <View style={{ flex: 1, backgroundColor: '#f5f3ff' }}>
+      <Header 
+        title="Gestão de Treinamentos" 
+        subtitle={`Usuário: ${user ? user.role : ''}`} 
+        onLogout={handleLogout} 
+      />
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          headerShown: false,
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+            if (route.name === 'Home') iconName = focused ? 'home' : 'home-outline';
+            else if (route.name === 'Agenda') iconName = focused ? 'calendar' : 'calendar-outline';
+            else if (route.name === 'Cadastro') iconName = focused ? 'build' : 'build-outline';
+            else if (route.name === 'Gestão') iconName = focused ? 'people' : 'people-outline';
+            else if (route.name === 'Certificados') iconName = focused ? 'ribbon' : 'ribbon-outline';
+            else if (route.name === 'Notificações') iconName = focused ? 'notifications' : 'notifications-outline';
+            else if (route.name === 'Instrutores') iconName = focused ? 'person-add' : 'person-add-outline';
+            
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: '#4f46e5', // Roxo principal
+          tabBarInactiveTintColor: 'gray',
+          tabBarStyle: {
+            backgroundColor: '#ffffff',
+            borderTopColor: '#e2e8f0',
+          }
+        })}
+      >
+        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Agenda" component={AgendaScreen} />
+        {(user.role === 'Organizador' || user.role === 'Administrador') && <Tab.Screen name="Cadastro" component={CadastroScreen} />}
+        {(user.role === 'Organizador' || user.role === 'Administrador') && <Tab.Screen name="Instrutores" component={InstrutoresScreen} />}
+        <Tab.Screen name="Gestão" component={GestaoScreen} />
+        <Tab.Screen name="Certificados" component={CertificadoScreen} />
+        <Tab.Screen name="Notificações" component={NotificacoesScreen} />
+      </Tab.Navigator>
+    </View>
   );
 }
 
@@ -58,7 +78,7 @@ const navTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: 'transparent',
+    background: '#f5f3ff', // Fundo principal roxinho claro
   },
 };
 
@@ -66,32 +86,13 @@ const navTheme = {
 export default function App() {
   return (
     <TrainingProvider>
-      <LinearGradient 
-        colors={['#e9d5ff', '#f8fafc']} 
-        start={{ x: 0, y: 1 }} 
-        end={{ x: 0, y: 0 }} 
-        style={{ flex: 1 }}
-      >
-        <NavigationContainer theme={navTheme}>
-          <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: 'transparent' } }}>
-            <Stack.Screen 
-            name="Login" 
-            component={LoginScreen}
-          />
-
-          <Stack.Screen 
-          name="Main" 
-          component={MainTabs} 
-          />
-
-          <Stack.Screen 
-          name="Avaliacao" 
-          component={AvaliacaoScreen} 
-          />
-
+      <NavigationContainer theme={navTheme}>
+        <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: '#f5f3ff' } }}>
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Main" component={MainTabs} />
+          <Stack.Screen name="Avaliacao" component={AvaliacaoScreen} />
         </Stack.Navigator>
       </NavigationContainer>
-      </LinearGradient>
     </TrainingProvider>
   );
 }
