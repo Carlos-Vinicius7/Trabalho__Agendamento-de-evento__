@@ -157,6 +157,15 @@ Painel administrativo. Serve como área de controle geral e pode conter:
 
 ## Componentes Reutilizáveis
 
+### `components/Header.js`
+
+Componente de cabeçalho reutilizável. Ele:
+
+- renderiza título e subtítulo;
+- exibe botão de logout quando recebe `onLogout`;
+- usa `SafeAreaView` para compatibilidade com dispositivos móveis;
+- centraliza o layout com estilo de cabeçalho escuro.
+
 ### `components/CustomPicker.js`
 
 Picker customizado para seleção de itens. Características:
@@ -216,6 +225,7 @@ Define estilos globais usados pelo app. Inclui:
 - `screens/NotificacoesScreen.js` — central de notificações.
 - `screens/RelatoriosScreen.js` — relatórios.
 - `screens/AdminScreen.js` — painel administrativo.
+- `components/Header.js` — cabeçalho reutilizável com título, subtítulo e logout.
 - `components/SimpleCalendar.js` — seletor de datas.
 - `components/CustomPicker.js` — seleção customizada.
 - `screens/Styles/globalStyles.js` — estilos globais.

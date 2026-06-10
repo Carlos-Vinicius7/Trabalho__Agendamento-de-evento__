@@ -1,7 +1,25 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { TrainingContext } from '../context/TrainingContext';
 
 export default function Header({ title, subtitle, onLogout }) {
+  const navigation = useNavigation();
+  const { setUser } = useContext(TrainingContext);
+
+  const handleLogout = () => {
+    if (onLogout) {
+      onLogout();
+      return;
+    }
+
+    setUser(null);
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerContainer}>
@@ -9,11 +27,9 @@ export default function Header({ title, subtitle, onLogout }) {
           <Text style={styles.title}>{title}</Text>
           {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
         </View>
-        {onLogout && (
-          <TouchableOpacity style={styles.logoutButton} onPress={onLogout}>
-            <Text style={styles.logoutText}>Sair</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Sair</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

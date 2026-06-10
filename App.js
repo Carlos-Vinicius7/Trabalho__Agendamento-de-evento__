@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -24,13 +24,22 @@ const Tab = createBottomTabNavigator();
 function MainTabs({ navigation }) {
   const { user, setUser } = useContext(TrainingContext); // Recupera dados do usuário logado
 
+  useEffect(() => {
+    if (!user) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    }
+  }, [navigation, user]);
+
   const handleLogout = () => {
     setUser(null);
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
   };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: '#f5f3ff' }}>
@@ -64,8 +73,8 @@ function MainTabs({ navigation }) {
       >
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Agenda" component={AgendaScreen} />
-        {(user.role === 'Organizador' || user.role === 'Administrador') && <Tab.Screen name="Cadastro" component={CadastroScreen} />}
-        {(user.role === 'Organizador' || user.role === 'Administrador') && <Tab.Screen name="Instrutores" component={InstrutoresScreen} />}
+        {user && (user.role === 'Organizador' || user.role === 'Administrador') && <Tab.Screen name="Cadastro" component={CadastroScreen} />}
+        {user && (user.role === 'Organizador' || user.role === 'Administrador') && <Tab.Screen name="Instrutores" component={InstrutoresScreen} />}
         <Tab.Screen name="Gestão" component={GestaoScreen} />
         <Tab.Screen name="Certificados" component={CertificadoScreen} />
         <Tab.Screen name="Notificações" component={NotificacoesScreen} />

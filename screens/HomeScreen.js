@@ -5,6 +5,10 @@ import { TrainingContext } from '../context/TrainingContext';
 
 export default function HomeScreen({ navigation }) {
   const { treinamentos, user } = useContext(TrainingContext);
+
+  if (!user) {
+    return null;
+  }
   
   return (
     <View style={globalStyles.container}>

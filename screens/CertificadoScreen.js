@@ -7,11 +7,11 @@ export default function CertificadoScreen() {
   const { treinamentos, user, podeGerarCertificado } = useContext(TrainingContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTraining, setSelectedTraining] = useState(null);
-  const [nomeCertificado, setNomeCertificado] = useState(user.nome);
+  const [nomeCertificado, setNomeCertificado] = useState(user?.nome || '');
 
   const handleEditCertificate = (treinamento) => {
     setSelectedTraining(treinamento);
-    setNomeCertificado(user.nome);
+    setNomeCertificado(user?.nome || '');
     setModalVisible(true);
   };
 

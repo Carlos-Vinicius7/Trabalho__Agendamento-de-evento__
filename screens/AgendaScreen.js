@@ -16,9 +16,26 @@ export default function AgendaScreen({ navigation }) {
           <Text style={[globalStyles.title, { marginBottom: 0 }]}>Agenda de Treinamentos</Text>
           <Text style={{ color: '#64748b' }}>{dados.length} treinamento(s) encontrado(s)</Text>
         </View>
-        <TouchableOpacity style={globalStyles.buttonPrimary} onPress={() => setMinhas(!minhas)}>
-          <Text style={globalStyles.buttonText}>{minhas ? "Ver Todos" : "Minhas Inscrições"}</Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
+          <TouchableOpacity
+            style={[
+              globalStyles.buttonSecondary,
+              { backgroundColor: minhas ? '#4f46e5' : '#e0e7ff' }
+            ]}
+            onPress={() => setMinhas(true)}
+          >
+            <Text style={[globalStyles.buttonTextSecondary, { color: minhas ? '#fff' : '#3730a3' }]}>Minhas Inscrições</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              globalStyles.buttonSecondary,
+              { backgroundColor: !minhas ? '#4f46e5' : '#e0e7ff' }
+            ]}
+            onPress={() => setMinhas(false)}
+          >
+            <Text style={[globalStyles.buttonTextSecondary, { color: !minhas ? '#fff' : '#3730a3' }]}>Ver Todos</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <FlatList
