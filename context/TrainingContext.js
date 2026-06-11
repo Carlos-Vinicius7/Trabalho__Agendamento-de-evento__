@@ -63,7 +63,9 @@ export const TrainingProvider = ({ children }) => {
       observacao: data.observacao,
       capacidade: parseInt(data.capacidade) || 0,
       materialUrl: data.materialUrl,
-      inscritos: []
+      inscritos: [],
+      lista_espera: [],
+      aprovado: false // por padrão, novos treinamentos precisam ser aprovados
     };
     setTreinamentos([...treinamentos, newTraining]);
   };
@@ -81,15 +83,67 @@ export const TrainingProvider = ({ children }) => {
   };
 
   const inscreverTreinamento = (treinamentoId, userId) => {
-    // Adiciona o usuário à lista de inscritos do treinamento
+    let status = ''; // Retorna status: JA_INSCRITO, JA_ESPERA, INSCRITO, ESPERA
     setTreinamentos(prev => prev.map(t => {
       if (t.treinamento_id === treinamentoId) {
-        if (!t.inscritos.includes(userId)) {
+        if (t.inscritos.includes(userId)) {
+          status = 'JA_INSCRITO';
+          return t;
+        }
+        if (t.lista_espera && t.lista_espera.includes(userId)) {
+          status = 'JA_ESPERA';
+          return t;
+        }
+
+        // Verifica capacidade (se capacidade for 0, consideramos ilimitado, ou podemos forçar limite. Vamos forçar o que estiver definido no contexto)
+        // Se a capacidade for maior que 0 e o número de inscritos for menor que a capacidade
+        if (t.capacidade === 0 || t.inscritos.length < t.capacidade) {
+          status = 'INSCRITO';
           return { ...t, inscritos: [...t.inscritos, userId] };
+        } else {
+          status = 'ESPERA';
+          return { ...t, lista_espera: [...(t.lista_espera || []), userId] };
         }
       }
       return t;
     }));
+    return status;
+  };
+
+  const convidarParticipante = (treinamentoId, userId) => {
+    const status = inscreverTreinamento(treinamentoId, userId);
+    const userObj = usuarios.find(u => u.id === userId);
+    const nome = userObj ? userObj.nome : 'Participante';
+
+    if (status === 'INSCRITO') {
+      setNotificacoes(prev => [...prev, { id: Date.now().toString(), mensagem: `Você enviou um convite para ${nome} e ele(a) foi inscrito(a) no treinamento.` }]);
+    } else if (status === 'ESPERA') {
+      setNotificacoes(prev => [...prev, { id: Date.now().toString(), mensagem: `${nome} foi colocado(a) na lista de espera do treinamento.` }]);
+    }
+    return status;
+  };
+
+  const aprovarTraining = (treinamentoId, aprovado = true) => {
+    setTreinamentos(prev => prev.map(t => t.treinamento_id === treinamentoId ? { ...t, aprovado } : t));
+  };
+
+  const alterarRole = (userId, newRole) => {
+    setUsuarios(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u));
+    // Se o usuário atual teve a role alterada, atualize o contexto `user` também
+    if (user && user.id === userId) {
+      setUser({ ...user, role: newRole });
+    }
+  };
+
+  const updateUsuario = (id, nome, senha, role) => {
+    setUsuarios(prev => prev.map(u => u.id === id ? { ...u, nome, senha, role } : u));
+    if (user && user.id === id) {
+      setUser({ ...user, nome, role }); // Update logged in user state
+    }
+  };
+
+  const deleteUsuario = (id) => {
+    setUsuarios(prev => prev.filter(u => u.id !== id));
   };
 
   const podeGerarCertificado = (tId, uId) => {
@@ -102,8 +156,9 @@ export const TrainingProvider = ({ children }) => {
     <TrainingContext.Provider value={{ 
       treinamentos, setTreinamentos, user, setUser, presencas, setPresencas, 
       avaliacoes, setAvaliacoes, notificacoes, setNotificacoes, 
-      addTraining, updateTraining, deleteTraining, inscreverTreinamento, podeGerarCertificado,
-      mockTiposTreinamento, instrutores, addInstrutor, updateInstrutor, deleteInstrutor, usuarios, addUsuario
+      addTraining, updateTraining, deleteTraining, inscreverTreinamento, convidarParticipante, podeGerarCertificado,
+      mockTiposTreinamento, instrutores, addInstrutor, updateInstrutor, deleteInstrutor, usuarios, addUsuario,
+      aprovarTraining, alterarRole, updateUsuario, deleteUsuario
     }}>
       {children}
     </TrainingContext.Provider>

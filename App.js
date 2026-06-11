@@ -16,6 +16,7 @@ import CertificadoScreen from './screens/CertificadoScreen';
 import NotificacoesScreen from './screens/NotificacoesScreen';
 import LoginScreen from './screens/LoginScreen';
 import AvaliacaoScreen from './screens/AvaliacaoScreen';
+import UsuariosScreen from './screens/UsuariosScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -60,6 +61,7 @@ function MainTabs({ navigation }) {
             else if (route.name === 'Certificados') iconName = focused ? 'ribbon' : 'ribbon-outline';
             else if (route.name === 'Notificações') iconName = focused ? 'notifications' : 'notifications-outline';
             else if (route.name === 'Instrutores') iconName = focused ? 'person-add' : 'person-add-outline';
+            else if (route.name === 'Usuários') iconName = focused ? 'settings' : 'settings-outline';
             
             return <Ionicons name={iconName} size={size} color={color} />;
           },
@@ -73,9 +75,10 @@ function MainTabs({ navigation }) {
       >
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Agenda" component={AgendaScreen} />
-        {user && (user.role === 'Organizador' || user.role === 'Administrador') && <Tab.Screen name="Cadastro" component={CadastroScreen} />}
-        {user && (user.role === 'Organizador' || user.role === 'Administrador') && <Tab.Screen name="Instrutores" component={InstrutoresScreen} />}
-        <Tab.Screen name="Gestão" component={GestaoScreen} />
+        {user && ['Organizador', 'Administrador'].includes(user.role) && <Tab.Screen name="Cadastro" component={CadastroScreen} />}
+        {user && ['Organizador', 'Administrador'].includes(user.role) && <Tab.Screen name="Instrutores" component={InstrutoresScreen} />}
+        {user && user.role === 'Administrador' && <Tab.Screen name="Usuários" component={UsuariosScreen} />}
+        {user && ['Instrutor', 'Organizador', 'Gestor', 'Administrador'].includes(user.role) && <Tab.Screen name="Gestão" component={GestaoScreen} />}
         <Tab.Screen name="Certificados" component={CertificadoScreen} />
         <Tab.Screen name="Notificações" component={NotificacoesScreen} />
       </Tab.Navigator>

@@ -1,13 +1,28 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Linking, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Linking, Alert, TextInput } from 'react-native';
 import { TrainingContext } from '../context/TrainingContext';
 import { globalStyles } from './Styles/globalStyles';
 
 export default function AgendaScreen({ navigation }) {
   const { treinamentos, user, inscreverTreinamento } = useContext(TrainingContext);
   const [minhas, setMinhas] = useState(false); 
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const dados = minhas ? treinamentos.filter(t => t.inscritos.includes(user.id)) : treinamentos;
+  const dados = treinamentos.filter(t => {
+    // Filtro "Minhas Inscrições"
+    if (minhas && !t.inscritos.includes(user.id) && !(t.lista_espera && t.lista_espera.includes(user.id))) return false;
+    
+    // Filtro de Texto (Busca)
+    if (searchQuery.trim() !== '') {
+      const q = searchQuery.toLowerCase();
+      const matchDesc = t.descricao.toLowerCase().includes(q);
+      const matchInicio = t.datahora_inicio && t.datahora_inicio.toLowerCase().includes(q);
+      const matchFim = t.datahora_fim && t.datahora_fim.toLowerCase().includes(q);
+      if (!matchDesc && !matchInicio && !matchFim) return false;
+    }
+    
+    return true;
+  });
 
   return (
     <View style={globalStyles.container}>
@@ -37,6 +52,13 @@ export default function AgendaScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </View>
+
+      <TextInput
+        style={[globalStyles.input, { marginBottom: 20 }]}
+        placeholder="🔍 Buscar por tema ou data..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
 
       <FlatList
         data={dados}
@@ -76,15 +98,29 @@ export default function AgendaScreen({ navigation }) {
                 <View style={[globalStyles.actionButtonLight, { backgroundColor: '#dcfce7' }]}>
                   <Text style={[globalStyles.actionTextLight, { color: '#166534' }]}>✅ Inscrito</Text>
                 </View>
+              ) : item.lista_espera && item.lista_espera.includes(user.id) ? (
+                <View style={[globalStyles.actionButtonLight, { backgroundColor: '#fef3c7' }]}>
+                  <Text style={[globalStyles.actionTextLight, { color: '#b45309' }]}>⏳ Na Lista de Espera</Text>
+                </View>
               ) : (
                 <TouchableOpacity 
-                  style={[globalStyles.actionButtonLight, { backgroundColor: '#4f46e5' }]}
+                  style={[globalStyles.actionButtonLight, { backgroundColor: (item.capacidade > 0 && item.inscritos.length >= item.capacidade) ? '#f59e0b' : '#4f46e5' }]}
                   onPress={() => {
-                    inscreverTreinamento(item.treinamento_id, user.id);
-                    Alert.alert('Sucesso', 'Inscrição realizada!');
+                    const status = inscreverTreinamento(item.treinamento_id, user.id);
+                    if (status === 'INSCRITO') {
+                      Alert.alert('Sucesso', 'Inscrição realizada!');
+                    } else if (status === 'ESPERA') {
+                      Alert.alert('Aviso', 'As vagas esgotaram, mas você foi adicionado à Lista de Espera!');
+                    } else if (status === 'JA_INSCRITO') {
+                      Alert.alert('Atenção', 'Você já está inscrito neste treinamento.');
+                    } else if (status === 'JA_ESPERA') {
+                      Alert.alert('Atenção', 'Você já está na lista de espera.');
+                    }
                   }} 
                 >
-                  <Text style={[globalStyles.actionTextLight, { color: '#fff' }]}>Inscrever-se</Text>
+                  <Text style={[globalStyles.actionTextLight, { color: '#fff' }]}>
+                    {(item.capacidade > 0 && item.inscritos.length >= item.capacidade) ? 'Entrar na Espera' : 'Inscrever-se'}
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>
