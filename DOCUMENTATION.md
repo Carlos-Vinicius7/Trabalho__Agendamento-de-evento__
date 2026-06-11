@@ -6,12 +6,13 @@ Este documento descreve o propósito de cada arquivo principal, a arquitetura do
 
 O app é um sistema de gestão de treinamentos organizado como uma aplicação React Native com Expo. Ele oferece funcionalidades para:
 
-- consultar agenda de treinamentos;
+- consultar agenda de treinamentos (com barra de busca integrada);
 - cadastrar novos cursos e instrutores;
-- inscrever usuários em eventos;
+- inscrever usuários em eventos (com controle de capacidade e lista de espera);
 - registrar presença e gerar certificados;
-- enviar notificações;
-- exibir relatórios e avaliações.
+- enviar notificações e convites para participantes;
+- exibir relatórios e avaliações;
+- gerenciar perfis de acesso sob uma hierarquia estrita de papéis.
 
 A estrutura foi pensada para facilitar o uso em dispositivos móveis e para permitir diferentes perfis de usuário (participante, gestor/admin).
 
@@ -49,9 +50,11 @@ Responsável por armazenar e compartilhar dados entre as telas. Contém:
   - `instrutores`
 - funções de manipulação:
   - `addInstrutor`, `updateInstrutor`, `deleteInstrutor`
-  - `addUsuario`
+  - `addUsuario`, `updateUsuario`, `deleteUsuario`, `alterarRole`
   - `addTraining`, `updateTraining`, `deleteTraining`
-  - `inscreverTreinamento`
+  - `inscreverTreinamento` (gerencia também a lista de espera)
+  - `convidarParticipante` (associa usuários diretamente)
+  - `aprovarTraining`
   - `podeGerarCertificado`
 - dados mock de tipos de treinamento e status.
 
@@ -80,9 +83,10 @@ Dashboard principal. Exibe:
 Agenda de eventos e treinamentos. Possui:
 
 - lista de treinamentos disponíveis;
-- filtro entre todos os treinamentos e inscrições do usuário;
-- botão de inscrição;
-- indicação de status de inscrição;
+- campo de **busca livre** (pesquisa por tema ou período);
+- filtro dinâmico entre todos os treinamentos e inscrições do usuário;
+- botão de inscrição (com trava automática para **Lista de Espera** caso exceda a capacidade de vagas);
+- indicação de status de inscrição (✅ Inscrito / ⏳ Na Lista de Espera);
 - opção de acessar material quando disponível.
 
 ### `screens/CadastroScreen.js`
@@ -96,12 +100,13 @@ Formulário de cadastro de treinamentos. Inclui:
 
 ### `screens/GestaoScreen.js`
 
-Gestão de treinamentos e presença. Permite:
+Gestão de treinamentos e presença, moldada pelo perfil hierárquico do usuário. Permite:
 
-- listar todos os treinamentos;
+- listar todos os treinamentos (visibilidade de ações depende da role);
 - marcar presença do usuário no evento;
-- editar ou excluir eventos;
-- enviar notificações internas;
+- editar ou excluir eventos (Organizadores/Admins);
+- enviar notificações e disparar **convites** para usuários (selecionados em um menu contendo nome e cargo);
+- aprovar treinamentos (exclusivo para Gestores/Admins);
 - usar calendário para alterar datas de evento.
 
 ### `screens/InstrutoresScreen.js`
@@ -112,6 +117,14 @@ Gerenciamento completo de instrutores. Funcionalidades:
 - editar informações de instrutores;
 - excluir instrutores;
 - exibir lista de profissionais cadastrados.
+
+### `screens/UsuariosScreen.js`
+
+Tela administrativa para gestão de perfis e acessos. Exclusiva para **Administradores**.
+Funcionalidades:
+- lista de todos os usuários cadastrados no sistema;
+- modal de edição para alterar Nome, Senha e modificar o **Nível/Cargo** do usuário (Administrador, Gestor, Organizador, Instrutor, Participante);
+- opção de excluir o perfil do sistema.
 
 ### `screens/CertificadoScreen.js`
 
@@ -216,9 +229,10 @@ Define estilos globais usados pelo app. Inclui:
 - `context/TrainingContext.js` — estado global e lógica de CRUD.
 - `screens/LoginScreen.js` — autenticação de usuários.
 - `screens/HomeScreen.js` — dashboard principal.
-- `screens/AgendaScreen.js` — agenda de treinamentos.
+- `screens/AgendaScreen.js` — agenda de treinamentos com busca e lista de espera.
 - `screens/CadastroScreen.js` — cadastro de treinamentos.
-- `screens/GestaoScreen.js` — gestão e presença.
+- `screens/GestaoScreen.js` — gestão, presenças, aprovações e convites.
+- `screens/UsuariosScreen.js` — CRUD e gestão de perfis de acesso.
 - `screens/InstrutoresScreen.js` — CRUD de instrutores.
 - `screens/CertificadoScreen.js` — certificados.
 - `screens/AvaliacaoScreen.js` — avaliações.
