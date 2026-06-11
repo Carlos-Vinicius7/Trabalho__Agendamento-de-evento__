@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Platform, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { TrainingContext } from '../context/TrainingContext';
 
@@ -38,6 +38,7 @@ export default function Header({ title, subtitle, onLogout }) {
 const styles = StyleSheet.create({
   safeArea: {
     backgroundColor: '#1e1b4b', // Fundo roxo bem escuro (topo)
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   headerContainer: {
     flexDirection: 'row',
