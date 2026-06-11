@@ -5,7 +5,7 @@ import { globalStyles } from './Styles/globalStyles';
 import CustomPicker from '../components/CustomPicker';
 
 export default function UsuariosScreen() {
-  const { usuarios, updateUsuario, deleteUsuario } = useContext(TrainingContext);
+  const { usuarios, updateUsuario, deleteUsuario, addUsuario } = useContext(TrainingContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
 
@@ -22,16 +22,26 @@ export default function UsuariosScreen() {
     setModalVisible(true);
   };
 
+  const handleCreate = () => {
+    setEditingUser({ nome: '', senha: '', role: 'Participante' });
+    setModalVisible(true);
+  };
+
   const saveEdit = () => {
     if (editingUser) {
       if (!editingUser.nome.trim() || !editingUser.senha.trim()) {
         Alert.alert('Erro', 'Nome e Senha são obrigatórios.');
         return;
       }
-      updateUsuario(editingUser.id, editingUser.nome, editingUser.senha, editingUser.role);
+      if (editingUser.id) {
+        updateUsuario(editingUser.id, editingUser.nome, editingUser.senha, editingUser.role);
+        Alert.alert('Sucesso', 'Usuário atualizado com sucesso!');
+      } else {
+        addUsuario(editingUser.nome, editingUser.senha, editingUser.role);
+        Alert.alert('Sucesso', 'Usuário criado com sucesso!');
+      }
       setModalVisible(false);
       setEditingUser(null);
-      Alert.alert('Sucesso', 'Usuário atualizado com sucesso!');
     }
   };
 
@@ -47,6 +57,10 @@ export default function UsuariosScreen() {
       <Text style={[globalStyles.title, { marginBottom: 10 }]}>Gestão de Usuários</Text>
       <Text style={{ color: '#64748b', marginBottom: 20 }}>Edite ou remova perfis de acesso</Text>
       
+      <TouchableOpacity style={[globalStyles.buttonPrimary, { marginBottom: 15 }]} onPress={handleCreate}>
+        <Text style={globalStyles.buttonText}>+ Criar Novo Usuário</Text>
+      </TouchableOpacity>
+
       <FlatList
         data={usuarios}
         keyExtractor={i => i.id}
@@ -74,7 +88,9 @@ export default function UsuariosScreen() {
       <Modal visible={modalVisible} transparent={true} animationType="fade">
         <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', padding: 20 }}>
           <ScrollView style={{ backgroundColor: '#fff', padding: 25, borderRadius: 20 }}>
-            <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 20, color: '#1e1b4b' }}>Editar Usuário</Text>
+            <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 20, color: '#1e1b4b' }}>
+              {editingUser?.id ? 'Editar Usuário' : 'Novo Usuário'}
+            </Text>
             
             <Text style={globalStyles.label}>Nome</Text>
             <TextInput 
